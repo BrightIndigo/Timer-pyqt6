@@ -1,7 +1,8 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QMainWindow, QPushButton, QVBoxLayout
 from PyQt6.QtCore import QSize, Qt, QTimer
-import time
+import datetime
+import csv
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -13,12 +14,16 @@ class MainWindow(QMainWindow):
         self.start_button = QPushButton("Start timer!")
         self.start_button.setCheckable(True)
         self.start_button.clicked.connect(self.button_clicked)
+        self.save_btn = QPushButton("Save")
+        self.save_btn.setCheckable(True)
+        self.save_btn.clicked.connect(self.save_clicked)
         self.label = QLabel('Timer not started')
+        self.save_label = QLabel('')
         self.seconds = 0
         self.minutes = 0
         self.hours = 0
         
-        widgets = [self.start_button, self.label]
+        widgets = [self.start_button, self.label, self.save_btn, self.save_label]
 
         for widget in widgets:
             layout.addWidget(widget)
@@ -38,7 +43,31 @@ class MainWindow(QMainWindow):
         else:
             self.timer.stop()
             self.start_button.setText("Start timer!")
-    
+
+    def save_clicked(self):
+        seconds = "00"
+        minutes = "00"
+        hours = "00"
+
+        if self.seconds < 10:
+            seconds = "0"+str(self.seconds)
+        else:
+            seconds = str(self.seconds)
+        if self.minutes < 10:
+            minutes = "0"+str(self.minutes)
+        else:
+            minutes = str(self.minutes)
+        if self.hours < 10:
+            hours = "0"+str(self.hours) 
+        else:
+            hours = str(self.hours)
+        
+        now = datetime.datetime.now()
+        
+        with open("times.csv", 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([hours, minutes, seconds, now.strftime("%d-%m-%Y, %H:%M:%S")])
+
     def timer_start(self):
         self.seconds += 1
         if self.seconds == 60:
