@@ -14,6 +14,9 @@ class MainWindow(QMainWindow):
         self.start_button = QPushButton("Start timer!")
         self.start_button.setCheckable(True)
         self.start_button.clicked.connect(self.button_clicked)
+        self.clear_button = QPushButton("Clear")
+        self.clear_button.setCheckable(True)
+        self.clear_button.clicked.connect(self.clear_clicked)
         self.save_btn = QPushButton("Save")
         self.save_btn.setCheckable(True)
         self.save_btn.clicked.connect(self.save_clicked)
@@ -23,7 +26,7 @@ class MainWindow(QMainWindow):
         self.minutes = 0
         self.hours = 0
         
-        widgets = [self.start_button, self.label, self.save_btn, self.save_label]
+        widgets = [self.start_button, self.label, self.save_btn, self.save_label, self.clear_button]
 
         for widget in widgets:
             layout.addWidget(widget)
@@ -96,6 +99,16 @@ class MainWindow(QMainWindow):
 
         self.label.setText(f'{hours}:{minutes}:{seconds}')
 
+    def clear_clicked(self):
+        self.seconds = 0
+        self.minutes = 0
+        self.hours = 0
+
+        hours = "00"
+        minutes = "00"
+        seconds = "00"
+
+        self.label.setText(f'{hours}:{minutes}:{seconds}')
 
 app = QApplication(sys.argv)
 window = MainWindow()
