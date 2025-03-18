@@ -11,23 +11,25 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Timer")
         self.setFixedSize(QSize(400, 300))
         layout = QVBoxLayout()
+
         self.start_button = QPushButton("Start timer!")
         self.start_button.setCheckable(True)
         self.start_button.clicked.connect(self.button_clicked)
+
         self.clear_button = QPushButton("Clear")
-        self.clear_button.setCheckable(True)
         self.clear_button.clicked.connect(self.clear_clicked)
+
         self.save_btn = QPushButton("Save")
-        self.save_btn.setCheckable(True)
         self.save_btn.clicked.connect(self.save_clicked)
+
         self.label = QLabel('Timer not started')
         self.save_label = QLabel('')
+
         self.seconds = 0
         self.minutes = 0
         self.hours = 0
-        
-        widgets = [self.start_button, self.label, self.save_btn, self.save_label, self.clear_button]
 
+        widgets = [self.start_button, self.label, self.save_btn, self.save_label, self.clear_button]
         for widget in widgets:
             layout.addWidget(widget)
 
@@ -47,29 +49,18 @@ class MainWindow(QMainWindow):
             self.timer.stop()
             self.start_button.setText("Start timer!")
 
-    def save_clicked(self):
-        seconds = "00"
-        minutes = "00"
-        hours = "00"
+    def format_time(self):
+        return f"{self.hours:02}:{self.minutes:02}:{self.seconds:02}"
 
-        if self.seconds < 10:
-            seconds = "0"+str(self.seconds)
-        else:
-            seconds = str(self.seconds)
-        if self.minutes < 10:
-            minutes = "0"+str(self.minutes)
-        else:
-            minutes = str(self.minutes)
-        if self.hours < 10:
-            hours = "0"+str(self.hours) 
-        else:
-            hours = str(self.hours)
-        
+    def save_clicked(self):
         now = datetime.datetime.now()
-        
-        with open("times.csv", 'a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([hours, minutes, seconds, now.strftime("%d-%m-%Y, %H:%M:%S")])
+        try:
+            with open("times.csv", 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([self.format_time(), now.strftime("%d-%m-%Y, %H:%M:%S")])
+            self.save_label.setText("Saved successfully!")
+        except Exception as e:
+            self.save_label.setText(f"Error: {e}")
 
     def timer_start(self):
         self.seconds += 1
@@ -80,35 +71,13 @@ class MainWindow(QMainWindow):
             self.hours += 1
             self.minutes = 0
 
-        seconds = "00"
-        minutes = "00"
-        hours = "00"
-
-        if self.seconds < 10:
-            seconds = "0"+str(self.seconds)
-        else:
-            seconds = str(self.seconds)
-        if self.minutes < 10:
-            minutes = "0"+str(self.minutes)
-        else:
-            minutes = str(self.minutes)
-        if self.hours < 10:
-            hours = "0"+str(self.hours) 
-        else:
-            hours = str(self.hours)
-
-        self.label.setText(f'{hours}:{minutes}:{seconds}')
+        self.label.setText(self.format_time())
 
     def clear_clicked(self):
         self.seconds = 0
         self.minutes = 0
         self.hours = 0
-
-        hours = "00"
-        minutes = "00"
-        seconds = "00"
-
-        self.label.setText(f'{hours}:{minutes}:{seconds}')
+        self.label.setText(self.format_time())
 
 app = QApplication(sys.argv)
 window = MainWindow()
